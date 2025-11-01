@@ -1,0 +1,447 @@
+/* =================================================================
+   CSS CLASSIFICATION FOR CHAT APPLICATION (room.php & fetch.php)
+   ================================================================= */
+
+/* --- 0. Global Variables & Base Styles --- */
+:root {
+    --bg-color-dark: #1e1e2f;       /* Main background */
+    --bg-color-medium: #27293d;     /* Header/Input background */
+    --bg-color-light: #30314a;      /* Default message bubble background */
+    --primary-color: #00bfff;       /* Bright Blue (Friend name, links, send button) */
+    --secondary-color: #00ff9d;     /* Bright Green (Self message bubble, success) */
+    --text-color: #ffffff;
+    --text-color-faded: #b0b0bb;
+    --error-color: #ff6b6b;         /* Red (Delete, errors) */
+    --border-color: #383a5e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, html {
+    background-color: var(--bg-color-dark);
+    color: var(--text-color);
+    min-height: 100vh;
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: bold;
+    color: var(--text-color);
+    background: var(--primary-color);
+}
+
+button:hover {
+    background: #00a0e0;
+}
+
+/* --- 1. Top Bar / Header (.top) --- */
+.top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-color-medium);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    z-index: 100;
+}
+
+.top h3 {
+    flex-grow: 1;
+    font-size: 1.1em;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top button {
+    margin-left: 10px;
+    background: var(--bg-color-light);
+    color: var(--text-color-faded);
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+/* --- 2. Activity/Participant Menus (#choice, #parr) --- */
+#choice, #parr {
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    background: var(--bg-color-light);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    z-index: 90;
+    padding: 10px;
+    display: none;
+}
+
+#choice {
+    display: flex;
+    flex-direction: row; 
+    gap: 10px;
+}
+
+#choice button {
+    background: var(--bg-color-medium);
+    padding: 6px;
+    min-width: 50px;
+    height: 20px;
+}
+
+#choice button span {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+}
+
+#parr {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 200px;
+    right: 5px;
+    padding: 15px;
+}
+
+.meta-list span {
+    display: block;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.9em;
+}
+
+/* --- 3. Invite Modal (#invite) --- */
+#invite {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+#invite > div {
+    background: var(--bg-color-medium);
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+}
+
+#invite input { /* Styling for link/code inputs */
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color-light);
+    color: var(--text-color);
+    flex: 1;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--error-color) !important;
+    padding: 5px 10px !important;
+    font-size: 1.2em !important;
+    border-radius: 50% !important;
+    width: 30px !important;
+    height: 30px !important;
+}
+
+/* --- 4. Chat Messages Area (#messages / fetch.php output) --- */
+#messages {
+    padding: 20px;
+    padding-top: 90px; 
+    padding-bottom: 120px; 
+    overflow-y: auto;
+    height: 100vh;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.no-messages {
+    text-align: center;
+    color: var(--text-color-faded);
+    padding: 20px;
+    font-style: italic;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    max-width: 80%;
+    align-self: flex-start; /* Default: friend on left */
+}
+ .self {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    max-width: 80%;
+    align-self: end;
+    justify-self: end;
+    background: var(--error-color);
+}
+
+/* Message Bubble (The actual chat content div) */
+.chat-message > div:not(.name) {
+    background: var(--bg-color-light);
+    padding: 10px 15px;
+    border-radius: 18px 18px 18px 4px; /* Default bubble style */
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 1em;
+    line-height: 1.4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+}
+
+.chat-message .name {
+    color: var(--primary-color);
+    font-size: 0.85em;
+    margin-bottom: 5px;
+    margin-left: 10px;
+    align-self: flex-start;
+}
+
+.chat-message .time {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.7em;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: right;
+    line-height: 1;
+}
+
+/* --- 4.1 Self-Sent Message Overrides (.self) --- */
+.chat-message.self {
+    align-self: flex-end; /* Align container to the right */
+    align-items: flex-end;
+}
+
+.chat-message.self > div:not(.name) {
+    background: var(--secondary-color);
+    color: var(--bg-color-dark);
+    border-radius: 18px 18px 4px 18px; /* Self bubble style */
+}
+
+.chat-message.self .name {
+    color: var(--secondary-color);
+    margin-left: 0;
+    margin-right: 10px;
+    align-self: flex-end;
+}
+
+.chat-message.self .time {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+/* --- 4.2 Media/File Previews --- */
+.preview {
+    margin-bottom: 10px;
+}
+
+.preview img, .chat-video {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    display: block;
+}
+
+.safe-link {
+    display: block;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    color: var(--primary-color);
+    word-break: break-all;
+    margin-bottom: 5px;
+}
+
+/* --- 5. Bottom Input Bar (.sbb) --- */
+.sbb {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-color-medium);
+    padding: 10px 20px;
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.inputputton {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+#msgInput {
+    flex-grow: 1;
+    min-height: 40px;
+    max-height: 150px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color-light);
+    color: var(--text-color);
+    resize: none;
+    font-size: 1em;
+    outline: none;
+}
+
+.inputputton button {
+    height: 40px;
+    width: 40px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+#sendBtn {
+    background: var(--primary-color);
+}
+
+/* --- 6. Uploader/Settings Modal (#uploaderlay, #cvvvv) --- */
+#uploaderlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+#cvvvv {
+    background: var(--bg-color-medium);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 350px;
+    z-index: 101;
+    position: relative;
+}
+
+#uploadForm input[type="file"] {
+    border: none;
+    padding: 10px 0;
+}
+
+#uploadForm button[type="submit"] {
+    background: var(--secondary-color);
+    color: var(--bg-color-dark);
+}
+
+#progressContainer {
+    height: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+#progressBar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.deletebb {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.del-btn {
+    background: var(--error-color);
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8em;
+}
+
+.btn-secondary { /* Used for "Make Private/Public" button */
+    background: var(--bg-color-light);
+    color: var(--text-color-faded);
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.9em;
+}
+
+/* --- 7. Mobile Responsiveness (Media Queries) --- */
+@media (max-width: 600px) {
+    .top {
+        padding: 10px;
+    }
+
+    .top h3 {
+        font-size: 1em;
+    }
+
+    #messages {
+        padding-top: 70px;
+        padding-bottom: 90px;
+    }
+
+    .sbb {
+        padding: 10px;
+    }
+
+    .inputputton button {
+        height: 35px;
+        width: 35px;
+    }
+}
+::-webkit-scrollbar{
+  width: 2px;
+  height: 2px;
+}
+::-webkit-slidebar-thumb{
+  background: #000;
+
+}
+::-webkit-scrollbar-track{
+  background: #ffffff;
+}
