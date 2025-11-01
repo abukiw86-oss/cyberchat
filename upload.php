@@ -14,7 +14,7 @@ header('Content-Type: application/json');
 
 // Allowed file types
 $allowed = ['jpg','jpeg','png','gif','mp4','mp3','pdf','txt','csv','sql','json'];
-$maxSize = 10 * 1024 * 1024; // 10MB
+$maxSize = 10 * 1024 * 1024;
 $uploadDir = "uploads/";
 
 if (!is_dir($uploadDir)) {
@@ -24,7 +24,6 @@ if (!is_dir($uploadDir)) {
 if (!empty($_FILES['file']['name']) && $room && $name) {
     $file = $_FILES['file'];
     
-    // Validate file
     if ($file['error'] !== UPLOAD_ERR_OK) {
         echo json_encode(['status' => 'error', 'message' => 'Upload error: ' . $file['error']]);
         exit;
@@ -41,8 +40,6 @@ if (!empty($_FILES['file']['name']) && $room && $name) {
         echo json_encode(['status' => 'error', 'message' => 'File type not allowed']);
         exit;
     }
-
-    // Generate safe filename
     $safeName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
     $targetPath = $uploadDir . $safeName;
 
@@ -54,7 +51,7 @@ if (!empty($_FILES['file']['name']) && $room && $name) {
         if ($stmt) {
             $stmt->bind_param("sssss", $room, $name, $user, $targetPath, $message);
             if ($stmt->execute()) {
-                // Update room last active
+                
                 $update = $conn->prepare("UPDATE rooms SET last_active = NOW() WHERE code = ?");
                 $update->bind_param("s", $room);
                 $update->execute();
@@ -62,7 +59,7 @@ if (!empty($_FILES['file']['name']) && $room && $name) {
                 
                 echo json_encode(['status' => 'success', 'message' => '✅ File uploaded successfully']);
             } else {
-                unlink($targetPath); // Remove file if DB insert fails
+                unlink($targetPath);
                 echo json_encode(['status' => 'error', 'message' => '❌ Database error']);
             }
             $stmt->close();
@@ -75,4 +72,5 @@ if (!empty($_FILES['file']['name']) && $room && $name) {
 } else {
     echo json_encode(['status' => 'error', 'message' => '❌ No file or invalid data']);
 }
+
 ?>
