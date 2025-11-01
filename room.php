@@ -1,8 +1,6 @@
 <?php
 // room.php
 require 'db.php';
-
-// Ensure visitor cookie
 if (!isset($_COOKIE['visitor_id'])) {
     $visitor_id = bin2hex(random_bytes(16));
     setcookie('visitor_id', $visitor_id, time() + (10*365*24*60*60), "/");
@@ -14,17 +12,15 @@ $visitor_id = $_COOKIE['visitor_id'];
 $room = trim($_GET['room'] ?? '');
 $room_type = trim($_GET['room_type'] ?? 'public');
 
-// Sanitize room code (alphanumeric and hyphens only)
 $room = preg_replace('/[^a-zA-Z0-9_-]/', '', $room);
 
-// Initialize name
 if(!isset($_COOKIE['nickname'])) {
     $name = trim($_GET['name'] ?? '');
 } else {
     $name = $_COOKIE['nickname'];
 }
 
-// Validate input
+
 if ($room === '' || $name === '') {
     header("Location: index.php?error=Room+and+name+are+required");
     exit;
@@ -32,10 +28,10 @@ if ($room === '' || $name === '') {
 
 $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
 
-// Set nickname cookie
+
 setcookie('nickname', $name, time() + (10*365*24*60*60), "/");
 
-// Create room if not exists
+
 $stmt = $conn->prepare("SELECT id, creator_id, status FROM rooms WHERE code = ?");
 if (!$stmt) die("DB error on room check");
 $stmt->bind_param("s", $room);
@@ -43,7 +39,6 @@ $stmt->execute();
 $res = $stmt->get_result();
 
 if ($res->num_rows === 0) {
-    // Create new room with specified type
     $ins = $conn->prepare("INSERT INTO rooms ( code, creator_id, status, last_active) VALUES (?, ?, ?, NOW())");
     $ins->bind_param("sss", $room, $visitor_id, $room_type);
     $ins->execute();
@@ -54,8 +49,7 @@ if ($res->num_rows === 0) {
     $room_data = $res->fetch_assoc();
     $is_creator = ($room_data['creator_id'] === $visitor_id);
     $room_status = $room_data['status'];
-    
-    // Check if user can join private room
+
     if ($room_status === 'private' && !$is_creator) {
         $check_user = $conn->prepare("SELECT id FROM user_rooms WHERE user_id = ? AND room_code = ?");
         $check_user->bind_param("ss", $visitor_id, $room);
@@ -71,21 +65,18 @@ if ($res->num_rows === 0) {
 }
 $stmt->close();
 
-// Record user in room
 $up = $conn->prepare("INSERT INTO user_rooms (user_id, room_code, nickname, last_joined) VALUES (?, ?, ?, NOW()) 
                      ON DUPLICATE KEY UPDATE last_joined = NOW(), nickname = VALUES(nickname)");
 $up->bind_param("sss", $visitor_id, $room, $name);
 $up->execute();
 $up->close();
 
-// Update participants count
 $cnt_sql = "UPDATE rooms SET participants = (SELECT COUNT(DISTINCT user_id) FROM user_rooms WHERE room_code = ?), last_active = NOW() WHERE code = ?";
 $cnt = $conn->prepare($cnt_sql);
 $cnt->bind_param("ss", $room, $room);
 $cnt->execute();
 $cnt->close();
 
-// Get room participants
 $part_stmt = $conn->prepare("SELECT nickname FROM user_rooms WHERE room_code = ? ORDER BY last_joined DESC");
 $part_stmt->bind_param("s", $room);
 $part_stmt->execute();
@@ -96,7 +87,6 @@ while ($row = $participants_result->fetch_assoc()) {
 }
 $part_stmt->close();
 
-// Get base URL for invites
 $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . dirname($_SERVER['PHP_SELF']) . "/index.php";
 
 ?>
@@ -114,105 +104,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     <link rel="shortcut icon" href="comment-solid-full.svg" type="image/x-icon">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Image Popup Styles */
-        .image-popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .image-popup-overlay.active {
-            opacity: 1;
-        }
-        
-        .image-popup-container {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .image-popup-content {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 8px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        .image-popup-overlay.active .image-popup-content {
-            transform: scale(1);
-        }
-        
-        .image-popup-close {
-            position: absolute;
-            top: -40px;
-            right: 0;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
-        
-        .image-popup-close:hover {
-            background: rgba(255, 0, 0, 0.7);
-        }
-        
-        .image-popup-info {
-            color: white;
-            text-align: center;
-            margin-top: 15px;
-            max-width: 600px;
-        }
-        
-        .image-popup-info .sender {
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        
-        .image-popup-info .timestamp {
-            color: #aaa;
-            font-size: 0.9em;
-        }
-        
-        /* Make chat images clickable */
-        .chat-image {
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            max-width: 300px;
-            border-radius: 8px;
-            margin: 5px 0;
-        }
-        
-        .chat-image:hover {
-            transform: scale(1.03);
-        }
-        
-        /* Chat message styles */
-
-        
-       
-    </style>
 </head>
 <body>
     <div class="top">
@@ -258,7 +149,6 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
         </div>
     </div>
     
-    <!-- Image Popup Modal -->
     <div id="imagePopup" class="image-popup-overlay">
         <div class="image-popup-container">
             <span class="image-popup-close" onclick="closeImagePopup()">✕</span>
@@ -342,12 +232,12 @@ $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     </div>
 
 <script>
-// PHP variables for JS
+
 const room = "<?= $room ?>";
 const name = "<?= $name ?>";
 const visitorId = "<?= $visitor_id ?>";
 
-// --- Image Popup Functions ---
+
 function openImagePopup(imageSrc, sender, timestamp) {
     const popup = document.getElementById('imagePopup');
     const popupImage = document.getElementById('popupImage');
@@ -362,8 +252,7 @@ function openImagePopup(imageSrc, sender, timestamp) {
     setTimeout(() => {
         popup.classList.add('active');
     }, 10);
-    
-    // Prevent body scroll when popup is open
+
     document.body.style.overflow = 'hidden';
 }
 
@@ -376,21 +265,20 @@ function closeImagePopup() {
     }, 300);
 }
 
-// Close image popup when clicking outside the image
+
 document.getElementById('imagePopup').addEventListener('click', function(event) {
     if (event.target === this) {
         closeImagePopup();
     }
 });
 
-// Close image popup with Escape key
+
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && document.getElementById('imagePopup').style.display === 'flex') {
         closeImagePopup();
     }
 });
 
-// --- UI Toggle Functions ---
 function openchoice(){
     const choice = document.getElementById('choice');
     choice.style.display = (choice.style.display === "flex") ? 'none' : 'flex';
@@ -424,21 +312,21 @@ function closeUploadModal() {
     document.getElementById('uploaderlay').style.display = 'none';
 }
 
-// Close upload modal by clicking outside
+
 document.getElementById('uploaderlay').addEventListener('click', function(event) {
     if (event.target === this) {
         closeUploadModal();
     }
 });
 
-// Close invite modal by clicking outside
+
 document.getElementById('invite').addEventListener('click', function(event) {
     if (event.target === this) {
         closeinvite();
     }
 });
 
-// --- Clipboard Functions ---
+
 function showCopyStatus(message) {
     const status = document.getElementById('copyStatus');
     status.textContent = '✅ ' + message;
@@ -462,7 +350,7 @@ function copyRoomCode() {
     }).catch(err => console.error('Could not copy text: ', err));
 }
 
-// --- Message & Fetch Logic ---
+
 function fetchMessages(){
     const messagesDiv = $('#messages')[1000];
     let shouldScroll = false;
@@ -513,7 +401,6 @@ function sendMessage(){
     }, 'json');
 }
 
-// Send text message handlers
 $('#sendBtn').click(sendMessage);
 $('#msgInput').keypress(function(e){
     if(e.which == 13 && !e.shiftKey) {
@@ -522,7 +409,7 @@ $('#msgInput').keypress(function(e){
     }
 });
 
-// File upload with progress
+
 $('#uploadForm').submit(function(e){
     e.preventDefault();
     
@@ -585,9 +472,9 @@ $('#uploadForm').submit(function(e){
     });
 });
 
-// Initial fetch and polling
 fetchMessages();
 setInterval(fetchMessages, 2000);
 </script>
 </body>
+
 </html>
