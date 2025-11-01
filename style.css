@@ -1,4 +1,4 @@
-/* premium-chat-ui.css - Optimized CSS for All Pages */
+
 :root {
   --primary: #00ff9d;
   --primary-dark: #00cc7a;
@@ -39,8 +39,6 @@
   --gradient-dark: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
   --gradient-card: linear-gradient(145deg, #1a1a1a, #151515);
 }
-
-/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -56,8 +54,6 @@ body {
   overflow-x: hidden;
   background-attachment: fixed;
 }
-
-/* Premium Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -156,16 +152,12 @@ body {
     background-position: 468px 0;
   }
 }
-
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   animation: fadeInUp 0.8s ease-out;
 }
-
-/* Premium Header Styles */
 h1, h2, h3, h4 {
   color: var(--text-light);
   margin-bottom: 1.5rem;
@@ -262,8 +254,6 @@ h3 {
   color: #ccffeb;
   box-shadow: 0 4px 15px rgba(0, 255, 157, 0.2);
 }
-
-/* Premium Grid Layout */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -276,8 +266,6 @@ h3 {
     grid-template-columns: 1fr 1fr;
   }
 }
-
-/* Enhanced Form Section */
 .form-section, .rooms-section {
   background: var(--gradient-card);
   border-radius: var(--radius-lg);
@@ -304,8 +292,6 @@ h3 {
   height: 4px;
   background: var(--gradient);
 }
-
-/* Premium Input Groups */
 .input-group {
   margin-bottom: 2rem;
   animation: fadeInUp 0.8s ease-out 0.4s both;
@@ -340,8 +326,6 @@ input[type="text"]:focus, textarea:focus {
   transform: translateY(-2px);
   background: rgba(0, 20, 10, 0.9);
 }
-
-/* Saved Name Styling */
 .saved-name {
   position: relative;
 }
@@ -377,8 +361,6 @@ input[type="text"]:focus, textarea:focus {
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
 }
-
-/* Enhanced Radio Group */
 .radio-group {
   display: flex;
   flex-direction: column;
@@ -439,8 +421,6 @@ input[type="text"]:focus, textarea:focus {
   margin-top: 6px;
   font-size: 0.9rem;
 }
-
-/* Premium Button Styles */
 button, .btn-primary, .btn-secondary, .del-btn, .time {
   display: inline-flex;
   align-items: center;
@@ -548,8 +528,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   transform: translateY(-4px);
   box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
 }
-
-/* Enhanced Room List Styles */
 .meta-list {
   display: flex;
   flex-direction: column;
@@ -675,8 +653,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   border: 2px dashed var(--border-color);
   animation: fadeInUp 0.8s ease-out;
 }
-
-/* Enhanced Room Page Styles */
 .top {
   background: var(--gradient-card);
   padding:10px;
@@ -830,8 +806,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(0, 255, 157, 0.2);
 }
-
-/* Premium Input Area */
 .sbb {
   background: var(--gradient-card);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -1059,8 +1033,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   border: 1px solid rgba(0, 255, 157, 0.2);
   animation: fadeInUp 0.3s ease-out;
 }
-
-/* Enhanced Upload Modal */
 #uploadForm {
   margin-bottom: 20px;
 }
@@ -1153,8 +1125,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   border-top: 1px solid var(--border-color);
   animation: fadeInUp 0.8s ease-out 0.6s both;
 }
-
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .container {
     padding: 15px;
@@ -1256,8 +1226,6 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
     font-size: 1.2rem;
   }
 }
-
-/* Loading Animation */
 .loading {
   display: inline-block;
   width: 24px;
@@ -1271,14 +1239,10 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
-/* Focus Ring */
 .focus-ring:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.5);
 }
-
-/* Custom styling for room.php specific elements */
 .top button {
   background: var(--secondary);
   color: white;
@@ -1294,19 +1258,17 @@ button:hover::before, .btn-primary:hover::before, .btn-secondary:hover::before, 
   background: var(--secondary-dark);
   transform: translateY(-2px);
 }
-
-/* Ensure proper spacing for room controls */
 .deletebb form, .deletebb > div {
   display: inline-block;
 }
-
-/* Fix for small buttons in room.php */
 button i + small, button i + span {
   margin-left: 5px;
 }
 
-/* Make sure all pages have consistent background */
+
 html, body {
   background: linear-gradient(135deg, #0a0a0a 0%, #0d1f17 50%, #0a2a1e 100%);
   min-height: 100vh;
+  user-select: none;
+
 }
