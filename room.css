@@ -1,17 +1,13 @@
-/* =================================================================
-   CSS CLASSIFICATION FOR CHAT APPLICATION (room.php & fetch.php)
-   ================================================================= */
 
-/* --- 0. Global Variables & Base Styles --- */
 :root {
-    --bg-color-dark: #1e1e2f;       /* Main background */
-    --bg-color-medium: #27293d;     /* Header/Input background */
-    --bg-color-light: #30314a;      /* Default message bubble background */
-    --primary-color: #00bfff;       /* Bright Blue (Friend name, links, send button) */
-    --secondary-color: #00ff9d;     /* Bright Green (Self message bubble, success) */
+    --bg-color-dark: #1e1e2f;     
+    --bg-color-medium: #27293d;     
+    --bg-color-light: #30314a; 
+    --primary-color: #00bfff;
+    --secondary-color: #00ff9d;   
     --text-color: #ffffff;
     --text-color-faded: #b0b0bb;
-    --error-color: #ff6b6b;         /* Red (Delete, errors) */
+    --error-color: #ff6b6b;        
     --border-color: #383a5e;
 }
 
@@ -49,8 +45,6 @@ button {
 button:hover {
     background: #00a0e0;
 }
-
-/* --- 1. Top Bar / Header (.top) --- */
 .top {
     position: fixed;
     top: 0;
@@ -82,7 +76,7 @@ button:hover {
     white-space: nowrap;
 }
 
-/* --- 2. Activity/Participant Menus (#choice, #parr) --- */
+
 #choice, #parr {
     position: absolute;
     top: 100%;
@@ -129,7 +123,6 @@ button:hover {
     font-size: 0.9em;
 }
 
-/* --- 3. Invite Modal (#invite) --- */
 #invite {
     position: fixed;
     top: 0;
@@ -153,7 +146,7 @@ button:hover {
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
 }
 
-#invite input { /* Styling for link/code inputs */
+#invite input { 
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -174,7 +167,7 @@ button:hover {
     height: 30px !important;
 }
 
-/* --- 4. Chat Messages Area (#messages / fetch.php output) --- */
+
 #messages {
     padding: 20px;
     padding-top: 90px; 
@@ -198,7 +191,7 @@ button:hover {
     flex-direction: column;
     margin-bottom: 15px;
     max-width: 80%;
-    align-self: flex-start; /* Default: friend on left */
+    align-self: flex-start; 
 }
  .self {
     display: flex;
@@ -210,11 +203,11 @@ button:hover {
     background: var(--error-color);
 }
 
-/* Message Bubble (The actual chat content div) */
+
 .chat-message > div:not(.name) {
     background: var(--bg-color-light);
     padding: 10px 15px;
-    border-radius: 18px 18px 18px 4px; /* Default bubble style */
+    border-radius: 18px 18px 18px 4px; 
     word-wrap: break-word;
     white-space: pre-wrap;
     font-size: 1em;
@@ -240,16 +233,16 @@ button:hover {
     line-height: 1;
 }
 
-/* --- 4.1 Self-Sent Message Overrides (.self) --- */
+
 .chat-message.self {
-    align-self: flex-end; /* Align container to the right */
+    align-self: flex-end;
     align-items: flex-end;
 }
 
 .chat-message.self > div:not(.name) {
     background: var(--secondary-color);
     color: var(--bg-color-dark);
-    border-radius: 18px 18px 4px 18px; /* Self bubble style */
+    border-radius: 18px 18px 4px 18px; 
 }
 
 .chat-message.self .name {
@@ -262,8 +255,6 @@ button:hover {
 .chat-message.self .time {
     color: rgba(0, 0, 0, 0.4);
 }
-
-/* --- 4.2 Media/File Previews --- */
 .preview {
     margin-bottom: 10px;
 }
@@ -332,7 +323,7 @@ button:hover {
     background: var(--primary-color);
 }
 
-/* --- 6. Uploader/Settings Modal (#uploaderlay, #cvvvv) --- */
+
 #uploaderlay {
     position: fixed;
     top: 0;
@@ -410,7 +401,7 @@ button:hover {
     font-size: 0.9em;
 }
 
-/* --- 7. Mobile Responsiveness (Media Queries) --- */
+
 @media (max-width: 600px) {
     .top {
         padding: 10px;
@@ -444,4 +435,5 @@ button:hover {
 }
 ::-webkit-scrollbar-track{
   background: #ffffff;
+
 }
