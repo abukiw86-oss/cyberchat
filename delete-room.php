@@ -4,8 +4,8 @@ require 'db.php';
 if (!isset($_COOKIE['visitor_id'])) {
     header("Location: index.php?error=Unauthorized");
     exit;
-}
 
+}
 $visitor_id = $_COOKIE['visitor_id'];
 $code = $_POST['code'] ?? '';
 

@@ -23,7 +23,7 @@ if ($room && $name && $msg !== '') {
     $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $msg = htmlspecialchars($msg, ENT_QUOTES, 'UTF-8');
     
-    $stmt = $conn->prepare("INSERT INTO messages (room_code, nickname, user_cookie, message) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO messages (room_code, nickname, visitor_hash, message) VALUES (?, ?, ?, ?)");
     if ($stmt) {
         $stmt->bind_param("ssss", $room, $name, $user, $msg);
         if ($stmt->execute()) {

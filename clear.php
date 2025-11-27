@@ -11,6 +11,11 @@ if (isset($_COOKIE['visitor_id'])) {
     $stmt->bind_param("s", $visitor_id);
     $stmt->execute();
     $stmt->close();
+
+    $utmt = $conn->prepare("DELETE FROM users WHERE recovery_hash = ?");
+    $utmt->bind_param("s", $visitor_id);
+    $utmt->execute();
+    $utmt->close();
     
     // Delete rooms created by user if empty
     $conn->query("DELETE FROM rooms WHERE creator_id = '" . $conn->real_escape_string($visitor_id) . "' 
@@ -21,7 +26,7 @@ if (isset($_COOKIE['visitor_id'])) {
 setcookie('visitor_id', '', time() - 3600, "/");
 setcookie('nickname', '', time() - 3600, "/");
 
-// Clear session data
+
 session_start();
 session_destroy();
 
